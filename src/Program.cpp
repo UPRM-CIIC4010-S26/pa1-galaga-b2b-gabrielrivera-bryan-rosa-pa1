@@ -59,10 +59,20 @@ void Program::Update() {
             p.update(); 
 
         }
+        //Adds score gained from Enemy::ManageEnemies to total score and score counter, then resets Enemy::scoreGained to 0.
+        score += Enemy::scoreGained;
+        scoreCounter += Enemy::scoreGained;
+        Enemy::setScore(0);
+
 
         if (lives <= 0 && pauseFrames <= 0) gameOver = true;
         Projectile::CleanProjectiles();
         Projectile::ProjectileCollision();
+    }
+    //Check if player gained 1000 points and if he already has 5 lives. If he doesn't have 5 lives, give him an extra life and reset score counter. If he has 5 lives, just reset score counter.
+        if (scoreCounter >= 1000) {
+            if (lives < 5) lives++;
+            scoreCounter = 0;
     }
 }
 
@@ -84,6 +94,9 @@ void Program::Draw() {
     if (startup) DrawStartup();
     if (paused) DrawPauseScreen();
     if (gameOver) DrawGameOver();
+
+    //Draws score if game is not in startup or game over state
+    if (!startup && !gameOver) DrawScore();
 }
 
 void Program::ManageEnemyRespawns() {
@@ -91,7 +104,8 @@ void Program::ManageEnemyRespawns() {
 
     respawnCooldown -= 1;
     if (respawnCooldown <= 0) {
-        respawnCooldown = 1080;
+        //Resets respawn cooldown to max cooldown.
+        respawnCooldown = maxCooldown;
         for (std::pair<std::pair<float, float>, Enemy*>& p : Enemy::enemies) {
             if (!p.second && p.first.second != 150) {
                 int eType = GetRandomValue(1, 3);
@@ -111,6 +125,12 @@ void Program::ManageEnemyRespawns() {
                 break;
             }
         }
+    }
+    //Reduces cooldown by 15% each time the 1,000 score threshold is reached, down to a minimum of 150.
+    if ((score - lastCooldownScore) >= 1000) {
+        maxCooldown = std::max(maxCooldown*0.85, 150.0);
+        respawnCooldown = maxCooldown;
+        lastCooldownScore = score;
     }
 
     if(respawns >= 4) {
@@ -147,6 +167,11 @@ void Program::DrawGameOver() {
     DrawText("Press Enter", (GetScreenWidth() / 2) - 75, GetScreenHeight() / 2, 24, GRAY);
 }
 
+//Draws score at the top center of the screen
+void Program::DrawScore() {
+    DrawText(("Score: " + std::to_string(score)).c_str(),GetScreenWidth() / 2 - 50, 10, 20, WHITE);
+}
+
 void Program::KeyInputs() {
     if ((!gameOver && !startup && IsKeyPressed('P')) || (paused && IsKeyPressed(KEY_ENTER))) paused = !paused;
     if (!paused && !startup && IsKeyPressed('O')) gameOver = !gameOver;
@@ -163,6 +188,9 @@ void Program::KeyInputs() {
     }
 
     if (!startup && !paused && !gameOver && pauseFrames <= 0) player->keyInputs();
+
+    //Tests score gain by adding 500 points every time 'K' is pressed. This is used to test if gaining 1000 points correctly gives the player an extra life and resets the score counter.
+    if (IsKeyPressed('K')) {score+=500; scoreCounter += 500;}
    
 }
 
@@ -187,4 +215,12 @@ void Program::Reset() {
     count = 0;
     delay = 0;
     lives = 3;
+
+    //Resets score and counter on reset
+    score = 0;
+    scoreCounter = 0;
+    Enemy::setScore(0);
+    //Resets max cooldown and last cooldown score on reset
+    maxCooldown = 1080;
+    lastCooldownScore = 0;
 }

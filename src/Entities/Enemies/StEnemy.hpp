@@ -18,4 +18,8 @@ class StEnemy : public Enemy {
         void draw() override;
         void update(std::pair<float, float> pos, HitBox target) override;
         void attack(HitBox target) override;
+        
+        //Returns score value of StEnemy. StEnemy is worth 80 points when killed.
+        int getScoreValue() override { return 80; }
+
 };

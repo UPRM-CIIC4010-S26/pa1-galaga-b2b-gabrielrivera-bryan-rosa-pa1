@@ -20,6 +20,11 @@ class Program {
         int lives = 3;
         int pauseFrames = 0;
 
+        int score = 0;
+        int scoreCounter = 0;
+        int maxCooldown = 1080;
+        int lastCooldownScore = 0;
+
         bool startup = true;
         bool paused = false;
         bool gameOver = false;
@@ -36,6 +41,8 @@ class Program {
         void KeyInputs();
         void PlayerReset();
         void Reset();
+        void DrawScore();
+        void DrawHighScore();
           
         ~Program() {}
 };

@@ -38,4 +38,7 @@ class StdEnemy : public Enemy {
                 attackCooldown = 360;
             }
         }
+        
+        //Returns score value of StdEnemy. StdEnemy is worth 50 points when killed.
+        int getScoreValue() override { return 50; }
 };

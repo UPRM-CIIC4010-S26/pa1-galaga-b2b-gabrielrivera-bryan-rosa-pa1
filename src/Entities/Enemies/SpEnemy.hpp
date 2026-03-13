@@ -23,4 +23,7 @@ class SpEnemy : public Enemy {
         void draw() override;
         void update(std::pair<float, float> pos, HitBox target) override;
         void attack(HitBox target) override;
+
+        //Returns score value of SpEnemy. SpEnemy is worth 150 points when killed.
+        int getScoreValue() override { return 400; }
 };

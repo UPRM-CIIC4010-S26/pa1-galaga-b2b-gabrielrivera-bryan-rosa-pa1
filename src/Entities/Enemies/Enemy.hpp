@@ -23,6 +23,9 @@ class Enemy {
         inline static int directionChange = 100;
         inline static std::vector<std::pair<std::pair<float, float>, Enemy*>> enemies;
 
+        //Static variable used to call score gained from killing an enemy in Program.cpp.
+        inline static int scoreGained = 0;
+
         Enemy() {}
 
         Enemy(float x, float y) {
@@ -35,6 +38,11 @@ class Enemy {
         virtual void update(std::pair<float, float> pos, HitBox target) = 0;
         virtual void attack(HitBox target) = 0;
 
+        //Member function that returns score value based on enemy type. Overrriden in Enemy member classes to return different score values.
+        virtual int getScoreValue() { return 50; }
+        //Static function used to set score gained from killing an enemy.
+        static void setScore(int scoreGained) {Enemy::scoreGained = scoreGained;}
+
         void frameChange() {
             frameCooldown--;
 
@@ -45,7 +53,8 @@ class Enemy {
         }
 
         static void ManageEnemies(HitBox target) {
-            for (std::pair<std::pair<float, float>, Enemy*>& p : Enemy::enemies) {
+            int gainedScore = 0;
+            for (std::pair<std::pair<float, float>, Enemy*>& p : Enemy::enemies) { 
                 p.first.first += (p.first.first == 0) ? 0 : direction;
                 if (p.second) {
                     p.second->update(p.first, target);
@@ -61,6 +70,8 @@ class Enemy {
                         Animation::animations.push_back(
                             Animation(p.second->position.first, p.second->position.second, 155, 0, 33, 33, 30, 30, 4, ImageManager::SpriteSheet)
                         );
+                        //Adds score gained from killing enemy by calling getScoreValue() from member class and sets it to Enemy::gainedScore for it to be called in Program.cpp
+                        setScore(p.second->getScoreValue());
                         p.second = nullptr;
                     }
                 }
