@@ -63,6 +63,8 @@ class Enemy {
                         if (p2.ID != 1 && HitBox::Collision(p.second->hitBox, p2.getHitBox())) {
                             p.second->health--;
                             p2.del = true;
+                            //Adds enemy collision counds
+                            PlaySound(SoundManager::hit);
                         }
                     }
 
@@ -72,6 +74,8 @@ class Enemy {
                         );
                         //Adds score gained from killing enemy by calling getScoreValue() from member class and sets it to Enemy::gainedScore for it to be called in Program.cpp
                         setScore(p.second->getScoreValue());
+                        //Add enemy death sound
+                        PlaySound(SoundManager::dead);
                         p.second = nullptr;
                     }
                 }
